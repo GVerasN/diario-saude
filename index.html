@@ -233,11 +233,13 @@
       <form class="entry" id="entryForm" autocomplete="off">
         <div class="field"><label for="fData">Data</label><input type="date" id="fData" required></div>
         <div class="field"><label for="fPeso">Peso (kg)</label><input type="number" id="fPeso" step="0.1" min="30" max="250" inputmode="decimal" placeholder="82,4"></div>
-        <div class="field"><label for="fCintura">Cintura no umbigo (cm)</label><input type="number" id="fCintura" step="0.5" min="40" max="200" inputmode="decimal" placeholder="opcional"></div>
-        <div class="field"><label for="fBf">Gordura corporal (%)</label><input type="number" id="fBf" step="0.1" min="3" max="60" inputmode="decimal" placeholder="balança ou DEXA"></div>
         <div class="field"><label for="fSono">Sono (horas)</label><input type="number" id="fSono" step="0.25" min="0" max="16" inputmode="decimal" placeholder="7,5"></div>
-        <div class="field"><label for="fPassos">Passos</label><input type="number" id="fPassos" step="100" min="0" max="80000" inputmode="numeric" placeholder="8000"></div>
-        <div class="field"><label for="fDor">Dor no joelho (0–10)</label><input type="number" id="fDor" step="1" min="0" max="10" inputmode="numeric" placeholder="0"></div>
+        <div class="field"><label for="fBf">Gordura corporal (%)</label><input type="number" id="fBf" step="0.1" min="3" max="60" inputmode="decimal" placeholder="bioimpedância"></div>
+        <div class="field"><label for="fMusculo">Massa muscular (kg)</label><input type="number" id="fMusculo" step="0.1" min="10" max="150" inputmode="decimal" placeholder="bioimpedância"></div>
+        <div class="field"><label for="fVisceral">Gordura visceral</label><input type="number" id="fVisceral" step="0.5" min="1" max="60" inputmode="decimal" placeholder="nível"></div>
+        <div class="field"><label for="fTmbBio">TMB da balança (kcal)</label><input type="number" id="fTmbBio" step="1" min="800" max="4000" inputmode="numeric" placeholder="opcional"></div>
+        <div class="field"><label for="fIdadeCorp">Idade corporal</label><input type="number" id="fIdadeCorp" step="1" min="10" max="100" inputmode="numeric" placeholder="opcional"></div>
+        <div class="field"><label for="fCintura">Cintura no umbigo (cm)</label><input type="number" id="fCintura" step="0.5" min="40" max="200" inputmode="decimal" placeholder="opcional, 1×/sem."></div>
         <div class="field"><label for="fTreino">Treino</label>
           <select id="fTreino">
             <option value="">—</option>
@@ -256,7 +258,7 @@
         <div class="field wide" style="align-content:end">
           <span class="check-row"><input type="checkbox" id="fFerro"><label for="fFerro" style="color:var(--ink);font-size:.9rem;font-weight:500">Feijão + vitamina C no almoço</label></span>
         </div>
-        <div class="field full"><label for="fNota">Notas do dia</label><textarea id="fNota" placeholder="Como foi o treino, fome, energia, algo fora do plano…"></textarea></div>
+        <div class="field full"><label for="fNota">Notas do dia</label><textarea id="fNota" placeholder="Como foi o treino, fome, energia, algo fora do plano…"></textarea><span class="small muted">As notas aparecem na última coluna do Histórico, logo abaixo.</span></div>
         <div class="actions">
           <button type="submit" class="btn-primary" id="btnSave">Salvar registro</button>
           <button type="button" class="btn-ghost" id="btnClear">Limpar</button>
@@ -286,7 +288,7 @@
           <thead><tr><th>Ritmo de perda (média 2 sem.)</th><th>O que fazer</th></tr></thead>
           <tbody>
             <tr><td>0,5–1% do peso por semana <span class="muted" id="regraFaixa"></span></td><td>Não mude nada.</td></tr>
-            <tr><td>Menos de 0,5% do peso por semana</td><td>Passos abaixo de 8 mil? Some 2 mil passos/dia. Já anda bem? −125 kcal do carboidrato.</td></tr>
+            <tr><td>Menos de 0,5% do peso por semana</td><td>−125 kcal do carboidrato (o cardápio tira o arroz sozinho).</td></tr>
             <tr><td>Mais de 1% do peso por semana</td><td>+125 kcal de carboidrato, para proteger a massa magra.</td></tr>
           </tbody>
         </table>
@@ -297,6 +299,7 @@
         <h3>Números de hoje</h3>
         <dl class="kv" id="kvPlan">
           <dt>TMB (Mifflin-St Jeor)</dt><dd id="kTmb">—</dd>
+          <dt>TMB da balança</dt><dd id="kTmbBio">—</dd>
           <dt>Gasto total estimado</dt><dd id="kGet">—</dd>
           <dt>Meta calórica</dt><dd id="kKcal">—</dd>
           <dt></dt><dd class="small muted" id="kKcalNota"></dd>
@@ -329,8 +332,8 @@
     </div>
     <div class="minis">
       <div class="panel"><div class="head"><h3>Sono</h3><span class="muted small">meta: 7,5–8 h</span></div><div class="chart-box" id="sChart"></div></div>
-      <div class="panel"><div class="head"><h3>Passos</h3><span class="muted small">meta: 7–10 mil</span></div><div class="chart-box" id="pChart"></div></div>
-      <div class="panel"><div class="head"><h3>Dor no joelho</h3><span class="muted small">0–3 ok · ≥ 6 reduzir carga</span></div><div class="chart-box" id="dChart"></div></div>
+      <div class="panel"><div class="head"><h3>Gordura corporal</h3><span class="muted small">bioimpedância, %</span></div><div class="chart-box" id="bfChart"></div></div>
+      <div class="panel"><div class="head"><h3>Massa muscular</h3><span class="muted small">bioimpedância, kg</span></div><div class="chart-box" id="mmChart"></div></div>
     </div>
     <div class="panel">
       <div class="head"><h3>Cintura</h3><span class="muted small">referência para homens: abaixo de 94 cm</span></div>
@@ -597,13 +600,6 @@
   function rolling(ws) {
     return ws.map((w) => ({ d: w.d, v: avgWindow(ws, w.d) })).filter((x) => x.v != null);
   }
-  function meanLast(field, days) {
-    const end = lastDate() || todayIso();
-    const start = addDays(end, -(days - 1));
-    const vals = [];
-    for (const [d, l] of state.logs) if (d >= start && d <= end && l[field] != null) vals.push(l[field]);
-    return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
-  }
   function lastDate() { const k = [...state.logs.keys()]; return k.length ? k[k.length - 1] : null; }
   function lastWeightDate() { const ws = weights(); return ws.length ? ws[ws.length - 1].d : null; }
 
@@ -639,7 +635,6 @@
     const since = diffDays(p.dataInicio, ref);
     const lastAdj = state.ajustes.length ? state.ajustes[state.ajustes.length - 1].data : null;
     const locked = lastAdj ? diffDays(lastAdj, ref) < 14 : false;
-    const passos = meanLast("passos", 14);
     if (c.rate == null) return { pill: "p-info", tag: "Coletando dados", title: "Registre o peso por pelo menos 14 dias", text: "Com duas semanas de pesagens (3 ou mais por semana), o painel compara as médias e diz se é hora de mexer na meta." };
     const r = c.ratePct;
     const faixa = `${fmt1(c.avgNow * RITMO_MIN / 100)}–${fmt1(c.avgNow * RITMO_MAX / 100)} kg`;
@@ -647,8 +642,7 @@
     if (since < 21) return { pill: "p-info", tag: "Fase de adaptação", title: "Só observando por enquanto", text: `${rateTxt} Nas 3 primeiras semanas, a creatina retém água e o glicogênio oscila, então o peso ainda não reflete a gordura. Mantenha o plano.` };
     if (r > RITMO_MAX) return mk("p-crit", "Rápido demais", "Suba 125 kcal de carboidrato", `${rateTxt} Acima de 1% do peso por semana (${fmt1(c.avgNow * RITMO_MAX / 100)} kg para você hoje) aumenta o risco de perder massa magra. O cardápio soma ~100 g de arroz por dia.`, 125, locked, lastAdj);
     if (r >= RITMO_MIN) return { pill: "p-good", tag: "No ritmo", title: "Não mude nada", text: `${rateTxt} Está dentro da faixa planejada: 0,5–1% do peso por semana (${faixa} para você hoje).` };
-    if (passos != null && passos < 8000) return { pill: "p-warn", tag: r < 0.25 ? "Estagnado" : "Lento", title: "Aumente os passos antes de cortar comida", text: `${rateTxt} Sua média é de ${fmt0(passos)} passos/dia. Some 2 mil passos por dia por 2 semanas antes de reduzir calorias.` };
-    return mk("p-warn", r < 0.25 ? "Estagnado" : "Lento", "Reduza 125 kcal do carboidrato", `${rateTxt} ${passos != null ? `Os passos já estão em ${fmt0(passos)}/dia, então` : "Então"} o próximo passo é cortar ~100 g de arroz por dia (o cardápio já recalcula). A proteína não muda.`, -125, locked, lastAdj);
+    return mk("p-warn", r < 0.25 ? "Estagnado" : "Lento", "Reduza 125 kcal do carboidrato", `${rateTxt} O próximo passo é cortar ~100 g de arroz por dia (o cardápio já recalcula). A proteína não muda.`, -125, locked, lastAdj);
   }
   function mk(pill, tag, title, text, delta, locked, lastAdj) {
     return { pill, tag, title, text, delta, locked, lastAdj };
@@ -692,6 +686,8 @@
     } else act.hidden = true;
 
     $("kTmb").textContent = `${fmt0(c.tmb)} kcal`;
+    const bio = [...state.logs.values()].reverse().find((l) => l.tmbBio != null);
+    $("kTmbBio").textContent = bio ? `${fmt0(bio.tmbBio)} kcal (${br(bio.data)})` : "registre no dia";
     $("kGet").textContent = `${fmt0(c.get)} kcal`;
     $("kKcal").textContent = `${fmt0(c.kcal)} kcal`;
     $("regraFaixa").textContent = `(${fmt1(c.avgNow * RITMO_MIN / 100)}–${fmt1(c.avgNow * RITMO_MAX / 100)} kg para você hoje)`;
@@ -715,8 +711,8 @@
     // gráficos
     renderWeight(c);
     renderMini("sChart", "sono", { target: 8, unit: "h", max: 10, fmt: fmt1 });
-    renderMini("pChart", "passos", { target: 8000, unit: "", max: null, fmt: fmt0 });
-    renderMini("dChart", "dor", { target: 3, unit: "/10", max: 10, fmt: fmt0, warnAbove: 5 });
+    renderLinha("bfChart", "bf", { unit: "%", desce: true });
+    renderLinha("mmChart", "musculo", { unit: " kg", desce: false });
     renderWaist();
     $("progSub").textContent = `De ${brFull(p.dataInicio)} até ${brFull(p.dataMeta)} · meta de ${fmt1(c.metaLo)}–${fmt1(c.metaHi)} kg`;
     // histórico, ajustes, perfil
@@ -841,7 +837,7 @@
     let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${field}, últimos 28 dias">`;
     s += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--line)"/>`;
     s += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(o.target)}" y2="${Y(o.target)}" stroke="var(--muted)" stroke-dasharray="3 3"/>`;
-    s += `<text x="${m.l - 4}" y="${Y(o.target) + 4}" text-anchor="end">${field === "passos" ? (o.target / 1000) + "k" : o.target}</text>`;
+    s += `<text x="${m.l - 4}" y="${Y(o.target) + 4}" text-anchor="end">${o.target}</text>`;
     s += `<text x="${m.l - 4}" y="${Y(0) + 4}" text-anchor="end">0</text>`;
     data.forEach((x, i) => {
       if (x.v == null) return;
@@ -852,6 +848,33 @@
     s += `<text x="${m.l}" y="${H - 4}">${br(days[0])}</text><text x="${W - m.r}" y="${H - 4}" text-anchor="end">${br(days[27])}</text></svg>`;
     const avg = have.reduce((a, b) => a + b.v, 0) / have.length;
     s += `<p class="small muted">Média de 28 dias: <b class="num" style="color:var(--ink)">${o.fmt(avg)}${o.unit}</b></p>`;
+    box.innerHTML = s;
+  }
+
+  // ---- linha de composição corporal (desde o início; escala só na faixa dos valores) ----
+  function renderLinha(id, field, o) {
+    const box = $(id);
+    const pts = [];
+    for (const [d, l] of state.logs) if (l[field] != null) pts.push({ d, v: l[field] });
+    if (!pts.length) { box.innerHTML = `<div class="empty small"><b>Sem dados</b><span>Aparece depois da primeira medição na bioimpedância.</span></div>`; return; }
+    const W = 300, H = 130, m = { l: 34, r: 8, t: 10, b: 20 };
+    const x0 = pts[0].d, x1 = pts[pts.length - 1].d, span = Math.max(1, diffDays(x0, x1));
+    const vs = pts.map((x) => x.v);
+    const yMin = Math.floor(Math.min(...vs) - 1), yMax = Math.ceil(Math.max(...vs) + 1);
+    const X = (d) => pts.length === 1 ? (m.l + W - m.r) / 2 : m.l + diffDays(x0, d) / span * (W - m.l - m.r);
+    const Y = (v) => m.t + (1 - (v - yMin) / (yMax - yMin)) * (H - m.t - m.b);
+    let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${field} ao longo do tempo">`;
+    for (const v of [yMin, (yMin + yMax) / 2, yMax]) s += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${m.l - 4}" y="${Y(v) + 4}" text-anchor="end">${fmt1(v)}</text>`;
+    if (pts.length > 1) s += `<path d="${pts.map((x, i) => `${i ? "L" : "M"}${X(x.d).toFixed(1)},${Y(x.v).toFixed(1)}`).join(" ")}" fill="none" stroke="var(--accent)" stroke-width="2"/>`;
+    for (const x of pts) s += `<circle cx="${X(x.d).toFixed(1)}" cy="${Y(x.v).toFixed(1)}" r="3.5" fill="var(--accent)"><title>${brFull(x.d)}: ${fmt1(x.v)}${o.unit}</title></circle>`;
+    s += `<text x="${m.l}" y="${H - 4}">${br(x0)}</text><text x="${W - m.r}" y="${H - 4}" text-anchor="end">${br(x1)}</text></svg>`;
+    const ult = pts[pts.length - 1], dif = ult.v - pts[0].v;
+    const bom = o.desce ? dif < 0 : dif > 0;
+    s += `<p class="small muted">Última: <b class="num" style="color:var(--ink)">${fmt1(ult.v)}${o.unit}</b>${pts.length > 1 ? ` · <span style="color:var(${Math.abs(dif) < 0.05 ? "--muted" : bom ? "--good" : "--coral"})">${dif > 0 ? "+" : "−"}${fmt1(Math.abs(dif))}${o.unit}</span> desde ${br(pts[0].d)}` : ""}</p>`;
+    if (field === "bf") {
+      const l = [...state.logs.values()].reverse().find((x) => x.visceral != null || x.idadeCorp != null);
+      if (l) s += `<p class="small muted">${[l.visceral != null ? `Visceral: <b>${fmt1(l.visceral)}</b>` : "", l.idadeCorp != null ? `idade corporal: <b>${l.idadeCorp}</b> anos` : ""].filter(Boolean).join(" · ")} (${br(l.data)})</p>`;
+    }
     box.innerHTML = s;
   }
 
@@ -883,9 +906,9 @@
     $("histCount").textContent = rows.length ? `${rows.length} registro${rows.length > 1 ? "s" : ""}` : "";
     const wrap = $("histWrap");
     if (!rows.length) { wrap.innerHTML = `<div class="empty"><b>Nenhum registro ainda</b><span>Preencha "Registrar o dia" acima. Cada dia aparece aqui e alimenta os gráficos.</span></div>`; return; }
-    let h = `<table class="hist-tbl"><thead><tr><th>Data</th><th class="n">Peso</th><th class="n">Cintura</th><th class="n">Sono</th><th class="n">Passos</th><th class="n">Dor</th><th>Treino</th><th>Cardápio</th><th>Ferro</th><th>Notas</th><th></th></tr></thead><tbody>`;
+    let h = `<table class="hist-tbl"><thead><tr><th>Data</th><th class="n">Peso</th><th class="n">Gord. %</th><th class="n">Músculo</th><th class="n">Visceral</th><th class="n">Sono</th><th class="n">Cintura</th><th>Treino</th><th>Cardápio</th><th>Ferro</th><th>Notas</th><th></th></tr></thead><tbody>`;
     for (const l of rows) {
-      h += `<tr><td class="num">${brFull(l.data)}</td><td class="n">${fmt1(l.peso)}</td><td class="n">${fmt1(l.cintura)}</td><td class="n">${fmt1(l.sono)}</td><td class="n">${fmt0(l.passos)}</td><td class="n">${l.dor ?? "—"}</td><td>${esc(l.treino || "—")}</td><td>${esc(l.vertente || "—")}</td><td>${l.ferro ? "✓" : "—"}</td><td class="small">${esc(l.nota || "")}</td>
+      h += `<tr><td class="num">${brFull(l.data)}</td><td class="n">${fmt1(l.peso)}</td><td class="n">${fmt1(l.bf)}</td><td class="n">${fmt1(l.musculo)}</td><td class="n">${fmt1(l.visceral)}</td><td class="n">${fmt1(l.sono)}</td><td class="n">${fmt1(l.cintura)}</td><td>${esc(l.treino || "—")}</td><td>${esc(l.vertente || "—")}</td><td>${l.ferro ? "✓" : "—"}</td><td class="small">${esc(l.nota || "")}</td>
       <td style="white-space:nowrap"><button class="btn-ghost btn-sm" data-edit="${l.data}">Editar</button> <button class="btn-danger btn-sm" data-del="${l.data}">Excluir</button></td></tr>`;
     }
     wrap.innerHTML = h + `</tbody></table>`;
@@ -924,12 +947,14 @@
     const data = $("fData").value;
     if (!data) { msg.className = "toast err"; msg.textContent = "Escolha a data."; return; }
     const l = {
+      // Campos que saíram do formulário (passos, dor) continuam guardados nos registros antigos.
+      ...(state.logs.get(data) || {}),
       data, peso: num($("fPeso").value), cintura: num($("fCintura").value), bf: num($("fBf").value), sono: num($("fSono").value),
-      passos: num($("fPassos").value), dor: num($("fDor").value), treino: $("fTreino").value || null, vertente: $("fVertente").value || null,
+      musculo: num($("fMusculo").value), visceral: num($("fVisceral").value), tmbBio: num($("fTmbBio").value), idadeCorp: num($("fIdadeCorp").value),
+      treino: $("fTreino").value || null, vertente: $("fVertente").value || null,
       ferro: $("fFerro").checked, nota: $("fNota").value.trim() || null
     };
-    if (l.dor != null && (l.dor < 0 || l.dor > 10)) { msg.className = "toast err"; msg.textContent = "A dor vai de 0 a 10."; return; }
-    if ([l.peso, l.cintura, l.sono, l.passos, l.dor].every((x) => x == null) && !l.nota && !l.treino) { msg.className = "toast err"; msg.textContent = "Preencha pelo menos um campo antes de salvar."; return; }
+    if ([l.peso, l.cintura, l.bf, l.musculo, l.visceral, l.tmbBio, l.idadeCorp, l.sono].every((x) => x == null) && !l.nota && !l.treino) { msg.className = "toast err"; msg.textContent = "Preencha pelo menos um campo antes de salvar."; return; }
     try { $("btnSave").disabled = true; await store.saveLog(l); msg.textContent = `Registro de ${brFull(data)} salvo.`; }
     catch (err) { msg.className = "toast err"; msg.textContent = "Não foi possível salvar. Verifique a conexão e tente de novo."; }
     finally { $("btnSave").disabled = false; }
@@ -940,7 +965,8 @@
     const l = state.logs.get(d);
     $("fData").value = d;
     $("fPeso").value = l?.peso ?? ""; $("fCintura").value = l?.cintura ?? ""; $("fBf").value = l?.bf ?? ""; $("fSono").value = l?.sono ?? "";
-    $("fPassos").value = l?.passos ?? ""; $("fDor").value = l?.dor ?? ""; $("fTreino").value = l?.treino ?? ""; $("fVertente").value = l?.vertente ?? "";
+    $("fMusculo").value = l?.musculo ?? ""; $("fVisceral").value = l?.visceral ?? ""; $("fTmbBio").value = l?.tmbBio ?? ""; $("fIdadeCorp").value = l?.idadeCorp ?? "";
+    $("fTreino").value = l?.treino ?? ""; $("fVertente").value = l?.vertente ?? "";
     $("fFerro").checked = !!l?.ferro; $("fNota").value = l?.nota ?? "";
     $("saveMsg").textContent = l ? `Editando ${brFull(d)}.` : "";
     if (scroll) document.getElementById("hoje").scrollIntoView();
