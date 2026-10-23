@@ -254,7 +254,7 @@
           <select id="fVertente"><option value="">—</option><option value="A">Vertente A · Clássica</option><option value="B">Vertente B · Peixe</option><option value="C">Vertente C · Caseira</option><option value="livre">Livre / fora do plano</option></select>
         </div>
         <div class="field wide" style="align-content:end">
-          <span class="check-row"><input type="checkbox" id="fFerro"><label for="fFerro" style="color:var(--ink);font-size:.9rem;font-weight:500">2 porções de leguminosa + vitamina C</label></span>
+          <span class="check-row"><input type="checkbox" id="fFerro"><label for="fFerro" style="color:var(--ink);font-size:.9rem;font-weight:500">Feijão + vitamina C no almoço</label></span>
         </div>
         <div class="field full"><label for="fNota">Notas do dia</label><textarea id="fNota" placeholder="Como foi o treino, fome, energia, algo fora do plano…"></textarea></div>
         <div class="actions">
@@ -285,10 +285,9 @@
         <table class="hist-tbl">
           <thead><tr><th>Ritmo de perda (média 2 sem.)</th><th>O que fazer</th></tr></thead>
           <tbody>
-            <tr><td>0,45–0,8 kg/semana</td><td>Não mude nada.</td></tr>
-            <tr><td>0,2–0,45 kg/semana, ou menos</td><td>Passos abaixo de 8 mil? Some 2 mil passos/dia. Já anda bem? −125 kcal do carboidrato.</td></tr>
-            <tr><td>0,8–1,0 kg/semana</td><td>Rápido, mas aceitável. Observe as cargas e a fome.</td></tr>
-            <tr><td>Mais de 1,0 kg/semana</td><td>+125 kcal de carboidrato, para proteger a massa magra.</td></tr>
+            <tr><td>0,5–1% do peso por semana <span class="muted" id="regraFaixa"></span></td><td>Não mude nada.</td></tr>
+            <tr><td>Menos de 0,5% do peso por semana</td><td>Passos abaixo de 8 mil? Some 2 mil passos/dia. Já anda bem? −125 kcal do carboidrato.</td></tr>
+            <tr><td>Mais de 1% do peso por semana</td><td>+125 kcal de carboidrato, para proteger a massa magra.</td></tr>
           </tbody>
         </table>
         </div>
@@ -300,6 +299,7 @@
           <dt>TMB (Mifflin-St Jeor)</dt><dd id="kTmb">—</dd>
           <dt>Gasto total estimado</dt><dd id="kGet">—</dd>
           <dt>Meta calórica</dt><dd id="kKcal">—</dd>
+          <dt></dt><dd class="small muted" id="kKcalNota"></dd>
           <dt>Déficit estimado</dt><dd id="kDef">—</dd>
         </dl>
         <div class="macro-bar" id="macroBar" aria-label="Divisão de macronutrientes"></div>
@@ -309,7 +309,7 @@
           <dt>Gordura</dt><dd id="kG">—</dd>
           <dt>Água</dt><dd id="kAgua">—</dd>
         </dl>
-        <p class="small muted">Proteína = <span id="kPgkg">2,0</span> g/kg da média de peso. Gordura = 0,8 g/kg (mínimo de 60 g). O carboidrato fecha a conta e é o primeiro a ser cortado.</p>
+        <p class="small muted">Proteína = <span id="kPgkg">2,0</span> g/kg da média de peso. Gordura = 0,8 g/kg (mínimo de 60 g). O carboidrato fecha a conta e é o primeiro a ser cortado. A meta calórica cai sozinha conforme o peso cai (o gasto diminui uns 15 kcal por kg); o ritmo semanal decide os ajustes maiores.</p>
       </div>
     </div>
   </section>
@@ -322,7 +322,7 @@
         <div class="legend">
           <span><i class="sw dot" style="background:var(--dot)"></i>Pesagem do dia</span>
           <span><i class="sw" style="background:var(--accent)"></i>Média de 7 dias</span>
-          <span><i class="sw band" style="background:var(--band)"></i>Faixa da meta (0,5–0,7 kg/sem.)</span>
+          <span><i class="sw band" style="background:var(--band)"></i>Faixa da meta (0,5–1% do peso/sem.)</span>
         </div>
       </div>
       <div class="chart-box" id="wChart"></div>
@@ -351,16 +351,17 @@
       <div class="panel c8">
         <div class="scroll-x"><table class="menu-tbl" id="menuTbl"></table></div>
         <div class="adjust-note" id="menuAdjust"></div>
-        <p class="small muted">Valores da Tabela TACO, aproximados, com alimentos cozidos. Rodízio sugerido: A e C na maioria dos dias, B (peixe) até 2×/semana.</p>
+        <p class="small muted">Valores da Tabela TACO, aproximados, com alimentos pesados cozidos (no MyFitnessPal, escolha o item "grelhado"/"cozido"). Rodízio: A e C no dia a dia; B quando tiver peixe em casa. Beef Protein: estimado em 34 g de proteína por dose.</p>
       </div>
       <div class="panel c4">
         <h3>Ferro sem carne vermelha</h3>
         <ul class="tips">
-          <li><b>2 porções de leguminosa por dia</b>: feijão, lentilha, grão-de-bico ou ervilha.</li>
-          <li><b>Vitamina C na mesma refeição</b>: limão no feijão, laranja ou acerola de sobremesa, tomate na salada.</li>
+          <li><b>Feijão todo dia no almoço</b> (escorrido, sem caldo, se preferir o prato seco). O cardápio fica em uns 8–9 mg de ferro por dia, perto do recomendado: pouca margem.</li>
+          <li><b>Vitamina C na mesma refeição</b>: limão no feijão, laranja de sobremesa, tomate na salada.</li>
           <li><b>Café, chá e laticínios</b> a pelo menos 1 h do almoço e do jantar.</li>
           <li><b>Feijão de molho</b> e água descartada antes de cozinhar: reduz os fitatos.</li>
-          <li><b>Sobrecoxa</b> tem mais ferro que o peito. Gema de ovo e aveia também somam.</li>
+          <li><b>Aveia, gema de ovo e pão integral</b> (farinha com ferro por lei) também somam.</li>
+          <li><b>Ferritina baixa?</b> Volte com feijão também no jantar.</li>
           <li><b>No hemograma semestral, peça ferritina junto.</b> O hemograma sozinho só acusa anemia quando o estoque já acabou.</li>
         </ul>
       </div>
@@ -433,31 +434,41 @@
     dataInicio: "2026-10-19", pesoInicio: 80, bfInicio: null,
     dataMeta: "2026-12-31", kcalAlvo: 2000, protGkg: 2.0, gordMin: 60, ultimoHemograma: ""
   };
+  // Cardápio-base (revisado em 22/10/2026). Itens fixos: [texto, kcal, P, C, G] da porção.
+  // Itens ajustáveis: { t, q, por100: [kcal, P, C, G], aj: "P" | "C" }. "P" acompanha a meta de proteína
+  // (frango/peixe) e "C" fecha as calorias (arroz/batata). Valores TACO, alimentos cozidos.
+  const FRANGO = [159, 32, 0, 2.5], ARROZ = [128, 2.5, 28.1, 0.2], BATATA = [52, 1.2, 11.9, 0.1], BATATA_DOCE = [77, 0.6, 18.4, 0.1], PESCADA = [110, 21, 0, 2.7];
+  const FEIJAO = ["feijão 120 g escorrido, com limão", 91, 5.8, 16.3, 0.6], AZEITE = ["azeite 1 col. de sopa", 88, 0, 0, 10], LARANJA = ["1 laranja de sobremesa", 52, 1.3, 12.5, 0.1];
+  const AVEIA = ["aveia 40 g", 158, 5.6, 26.6, 3.4], OVOS_MANTEIGA = ["2 ovos mexidos com manteiga 5 g (1 col. de chá rasa)", 182, 13.3, 0.6, 13.6], BEEF = ["1 dose de Beef Protein", 140, 34, 1, 1];
+  const POS_LEVE = [["1 banana", 78, 1, 20.8, 0.1], ["amendoim sem sal 20 g", 121, 4.5, 3.7, 10.9], ["uva 50 g (uns 8 bagos, opcional)", 27, 0.3, 6.8, 0.1]];
   const VERTENTES = {
-    A: { nome: "Clássica", refeicoes: [
-      ["Café", "Iogurte natural desnatado 170 g + aveia 40 g + 1 maçã + psyllium 5 g · 2 ovos cozidos ou mexidos sem manteiga", 465, 26, 58, 14],
-      ["Almoço", "Peito de frango grelhado 130 g · arroz 80 g · feijão 150 g com limão · folhas + tomate · azeite 1 col. de sopa · 1 laranja", 587, 53, 60, 15],
-      ["Pós-treino", "1 dose de Beef Protein na água · 1 banana + uva (100 g) · 20 g de amendoim sem sal", 420, 42, 44, 12],
-      ["Jantar", "Frango desfiado 120 g · 2 fatias de pão integral · salada de folhas, tomate e grão-de-bico (60 g) com limão · azeite 1 col. de sopa", 523, 50, 45, 17]
+    A: { nome: "Clássica", nota: "Beef Protein: 1 dose por dia, no café. <b>Feijão escorrido</b>: pegue com a escumadeira, sem o caldo.", refeicoes: [
+      ["Café", [AVEIA, ["2 frutas (maçã + banana ou mexerica)", 162, 1.4, 43.6, 0.1], OVOS_MANTEIGA, BEEF]],
+      ["Almoço", [{ t: "frango grelhado", q: 150, por100: FRANGO, aj: "P" }, { t: "arroz", q: 130, por100: ARROZ, aj: "C" }, FEIJAO, ["folhas + tomate", 20, 1, 4, 0], AZEITE, LARANJA]],
+      ["Pós-treino", POS_LEVE],
+      ["Jantar", [{ t: "frango desfiado", q: 150, por100: FRANGO, aj: "P" }, ["2 fatias de pão integral", 127, 4.7, 25, 1.9], ["salada de folhas, tomate e cenoura com limão", 30, 1, 6, 0], AZEITE]]
     ]},
-    B: { nome: "Peixe", refeicoes: [
-      ["Café", "Iogurte natural desnatado 170 g + aveia 40 g + 1 maçã + psyllium 5 g · 2 ovos mexidos sem manteiga · 10 g de amendoim", 525, 28, 60, 19],
-      ["Almoço", "Salmão grelhado 120 g (ou pescada amarela 150 g + 1 col. de sopa de azeite) · batata cozida 250 g · feijão 150 g com limão · folhas + vinagrete · 1 laranja", 638, 41, 67, 23],
-      ["Pós-treino", "Frango grelhado 150 g · batata-doce 150 g · ½ maçã", 390, 49, 38, 4],
-      ["Jantar", "2 fatias de pão integral + creme de ricota (30 g) + 1 ovo · frango desfiado 100 g · brócolis refogado com 1 col. de sobremesa de azeite", 473, 49, 31, 18]
+    B: { nome: "Peixe", nota: "Vertente eventual: para quando tiver peixe em casa. Café igual ao da A, com iogurte.", refeicoes: [
+      ["Café", [["iogurte natural desnatado 170 g", 70, 6.5, 9.9, 0.5], AVEIA, ["1 maçã", 84, 0.4, 22.8, 0], OVOS_MANTEIGA, BEEF]],
+      ["Almoço", [{ t: "pescada amarela grelhada", q: 180, por100: PESCADA, aj: "P", depois: "(ou salmão, quando tiver)" }, { t: "batata cozida", q: 250, por100: BATATA, aj: "C" }, FEIJAO, ["folhas + vinagrete", 20, 1, 4, 0], AZEITE, LARANJA]],
+      ["Pós-treino", POS_LEVE],
+      ["Jantar", [{ t: "frango grelhado", q: 160, por100: FRANGO, aj: "P" }, { t: "batata-doce", q: 200, por100: BATATA_DOCE, aj: "C" }, ["salada de folhas e tomate", 20, 1, 4, 0], AZEITE]]
     ]},
-    C: { nome: "Caseira", refeicoes: [
-      ["Café", "1 fatia de pão integral + queijo minas (30 g) + 1 ovo cozido · ½ dose de Beef Protein · 1 maçã · 2 castanhas-do-pará", 415, 33, 35, 17],
-      ["Almoço", "Frango grelhado 150 g · arroz 130 g · feijão 120 g com limão · couve refogada · tomate/vinagrete · azeite 1 col. de sopa", 650, 59, 61, 18],
-      ["Pós-treino", "2 ovos cozidos + 1 fatia de pão integral · 1 banana + morangos (100 g)", 335, 18, 46, 11],
-      ["Jantar", "Sobrecoxa de frango sem pele assada 140 g · arroz 70 g · lentilha 120 g · salada (folha, tomate, cenoura) com limão · 1 laranja", 615, 53, 59, 18]
+    C: { nome: "Caseira", nota: "<b>Shake de banana com morango</b>: 1 banana congelada em rodelas, 100 g de morango congelado, 2 col. de sopa de leite em pó desnatado, 20 g de aveia, 1 col. de sopa de pasta de amendoim, a outra ½ dose do Beef Protein, 150–200 ml de água gelada e canela. Bata tudo. Azeite medido com a colher: 1 por refeição, a couve é refogada dentro dela.", refeicoes: [
+      ["Café", [["1 fatia de pão integral + queijo minas 30 g", 142, 7.6, 13.5, 7], ["1 ovo cozido", 73, 6.7, 0.3, 4.8], ["½ dose de Beef Protein (shot)", 70, 17, 0.5, 0.5], ["1 maçã", 84, 0.4, 22.8, 0], ["2 castanhas-do-pará", 51, 1.2, 1, 5.1]]],
+      ["Almoço", [{ t: "frango grelhado", q: 150, por100: FRANGO, aj: "P" }, { t: "arroz", q: 130, por100: ARROZ, aj: "C" }, FEIJAO, ["couve refogada", 16, 1.7, 2.6, 0.3], ["tomate/vinagrete", 15, 0.5, 3, 0], AZEITE, LARANJA]],
+      ["Pós-treino", [["shake de banana com morango (receita abaixo)", 417, 32, 55, 10.2]]],
+      ["Jantar", [{ t: "peito de frango grelhado", q: 130, por100: FRANGO, aj: "P" }, { t: "arroz", q: 100, por100: ARROZ, aj: "C" }, ["feijão 60 g escorrido", 46, 2.9, 8.2, 0.3], ["salada com limão", 30, 1, 6, 0], AZEITE]]
     ]}
   };
+  // Ritmo de perda planejado: % do peso por semana (protege a massa magra).
+  const RITMO_MIN = 0.5, RITMO_MAX = 1.0;
 
   // ---------- utilidades ----------
   const $ = (id) => document.getElementById(id);
   const nf1 = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   const nf0 = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 0 });
+  const nf2 = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const fmt1 = (v) => (v == null || isNaN(v)) ? "—" : nf1.format(v);
   const fmt0 = (v) => (v == null || isNaN(v)) ? "—" : nf0.format(v);
   const parseD = (s) => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
@@ -515,7 +526,7 @@
       state.profileSaved = !!part.profile;
       state.profile = { ...DEFAULT_PROFILE, ...(part.profile || {}) };
       if (!$("profForm").contains(document.activeElement)) fillProfileForm();
-      $("mKcal").value = state.profile.kcalAlvo;
+      $("mKcal").value = ""; // o render preenche com a meta de hoje
     }
     if ("logs" in part) { state.logs = new Map(Object.entries(part.logs).sort((a, b) => a[0] < b[0] ? -1 : 1)); }
     if ("ajustes" in part) { state.ajustes = [...part.ajustes].sort((a, b) => (a.data + (a.ts || "")) < (b.data + (b.ts || "")) ? -1 : 1); }
@@ -606,16 +617,20 @@
     const refDate = lwd || todayIso();
     const weeksLeft = Math.max(0, diffDays(refDate, p.dataMeta) / 7);
     const weeksTotal = Math.max(0.1, diffDays(p.dataInicio, p.dataMeta) / 7);
-    const metaHi = p.pesoInicio - 0.5 * weeksTotal;
-    const metaLo = p.pesoInicio - 0.7 * weeksTotal;
+    const metaHi = p.pesoInicio * (1 - RITMO_MIN / 100) ** weeksTotal;
+    const metaLo = p.pesoInicio * (1 - RITMO_MAX / 100) ** weeksTotal;
+    const ratePct = rate != null ? rate / avgNow * 100 : null;
     const proj = rate != null ? avgNow - rate * weeksLeft : null;
     const tmb = 10 * avgNow + 6.25 * p.altura - 5 * p.idade + (p.sexo === "F" ? -161 : 5);
     const get = tmb * p.fator;
-    const kcal = p.kcalAlvo;
+    // A meta salva vale para o peso do último ajuste (pesoRefKcal). Conforme o peso cai, o gasto cai
+    // junto (10 kcal/kg × fator de atividade) e a meta acompanha, mantendo o mesmo déficit.
+    const pesoRef = p.pesoRefKcal ?? p.pesoInicio;
+    const kcal = round5(p.kcalAlvo - 10 * p.fator * (pesoRef - avgNow));
     const P = round5(p.protGkg * avgNow);
     const G = Math.max(p.gordMin, round5(0.8 * avgNow));
     const C = Math.max(0, Math.round((kcal - 4 * P - 9 * G) / 4));
-    return { ws, lwd, avgNow, rate, weeksLeft, weeksTotal, metaHi, metaLo, proj, tmb, get, kcal, P, G, C, agua: avgNow * 0.042 };
+    return { ws, lwd, avgNow, rate, ratePct, pesoRef, weeksLeft, weeksTotal, metaHi, metaLo, proj, tmb, get, kcal, P, G, C, agua: avgNow * 0.042 };
   }
 
   function decide(c) {
@@ -626,14 +641,14 @@
     const locked = lastAdj ? diffDays(lastAdj, ref) < 14 : false;
     const passos = meanLast("passos", 14);
     if (c.rate == null) return { pill: "p-info", tag: "Coletando dados", title: "Registre o peso por pelo menos 14 dias", text: "Com duas semanas de pesagens (3 ou mais por semana), o painel compara as médias e diz se é hora de mexer na meta." };
-    const r = c.rate;
-    const rateTxt = `Você está perdendo ${fmt1(r)} kg por semana (média das últimas 2 semanas).`;
+    const r = c.ratePct;
+    const faixa = `${fmt1(c.avgNow * RITMO_MIN / 100)}–${fmt1(c.avgNow * RITMO_MAX / 100)} kg`;
+    const rateTxt = `Você está perdendo ${fmt1(c.rate)} kg por semana, ${nf2.format(r)}% do peso (média das últimas 2 semanas).`;
     if (since < 21) return { pill: "p-info", tag: "Fase de adaptação", title: "Só observando por enquanto", text: `${rateTxt} Nas 3 primeiras semanas, a creatina retém água e o glicogênio oscila, então o peso ainda não reflete a gordura. Mantenha o plano.` };
-    if (r > 1.0) return mk("p-crit", "Rápido demais", "Suba 125 kcal de carboidrato", `${rateTxt} Acima de 1 kg/semana aumenta o risco de perder massa magra. Some ~100 g de arroz (ou 250 g de batata) ao dia.`, 125, locked, lastAdj);
-    if (r > 0.8) return { pill: "p-warn", tag: "Um pouco rápido", title: "Aceitável, mas observe", text: `${rateTxt} Se as cargas caírem ou a fome apertar, suba 100–150 kcal de carboidrato.` };
-    if (r >= 0.45) return { pill: "p-good", tag: "No ritmo", title: "Não mude nada", text: `${rateTxt} Está dentro da faixa planejada (0,5–0,7 kg/semana).` };
-    if (passos != null && passos < 8000) return { pill: "p-warn", tag: r < 0.2 ? "Estagnado" : "Lento", title: "Aumente os passos antes de cortar comida", text: `${rateTxt} Sua média é de ${fmt0(passos)} passos/dia. Some 2 mil passos por dia por 2 semanas antes de reduzir calorias.` };
-    return mk("p-warn", r < 0.2 ? "Estagnado" : "Lento", "Reduza 125 kcal do carboidrato", `${rateTxt} ${passos != null ? `Os passos já estão em ${fmt0(passos)}/dia, então` : "Então"} o próximo passo é cortar ~100 g de arroz por dia. A proteína não muda.`, -125, locked, lastAdj);
+    if (r > RITMO_MAX) return mk("p-crit", "Rápido demais", "Suba 125 kcal de carboidrato", `${rateTxt} Acima de 1% do peso por semana (${fmt1(c.avgNow * RITMO_MAX / 100)} kg para você hoje) aumenta o risco de perder massa magra. O cardápio soma ~100 g de arroz por dia.`, 125, locked, lastAdj);
+    if (r >= RITMO_MIN) return { pill: "p-good", tag: "No ritmo", title: "Não mude nada", text: `${rateTxt} Está dentro da faixa planejada: 0,5–1% do peso por semana (${faixa} para você hoje).` };
+    if (passos != null && passos < 8000) return { pill: "p-warn", tag: r < 0.25 ? "Estagnado" : "Lento", title: "Aumente os passos antes de cortar comida", text: `${rateTxt} Sua média é de ${fmt0(passos)} passos/dia. Some 2 mil passos por dia por 2 semanas antes de reduzir calorias.` };
+    return mk("p-warn", r < 0.25 ? "Estagnado" : "Lento", "Reduza 125 kcal do carboidrato", `${rateTxt} ${passos != null ? `Os passos já estão em ${fmt0(passos)}/dia, então` : "Então"} o próximo passo é cortar ~100 g de arroz por dia (o cardápio já recalcula). A proteína não muda.`, -125, locked, lastAdj);
   }
   function mk(pill, tag, title, text, delta, locked, lastAdj) {
     return { pill, tag, title, text, delta, locked, lastAdj };
@@ -653,7 +668,7 @@
     $("stAvg").innerHTML = c.lwd ? `${fmt1(c.avgNow)} <small>kg</small>` : "—";
     $("stAvgSub").textContent = c.lwd ? `${fmt1(p.pesoInicio - c.avgNow)} kg desde ${br(p.dataInicio)}` : "sem pesagens ainda";
     $("stRate").innerHTML = c.rate != null ? `${c.rate >= 0 ? "−" : "+"}${fmt1(Math.abs(c.rate))} <small>kg/sem</small>` : "—";
-    $("stRateSub").textContent = c.rate != null ? "meta: −0,5 a −0,7 kg/sem" : "precisa de 14 dias de pesagens";
+    $("stRateSub").textContent = c.rate != null ? `${nf2.format(c.ratePct)}% do peso · meta: −${fmt1(c.avgNow * RITMO_MIN / 100)} a −${fmt1(c.avgNow * RITMO_MAX / 100)} kg/sem` : "precisa de 14 dias de pesagens";
     $("stProj").innerHTML = c.proj != null ? `${fmt1(c.proj)} <small>kg</small>` : `${fmt1((c.metaHi + c.metaLo) / 2)} <small>kg</small>`;
     $("stProjSub").textContent = c.proj != null ? `faixa da meta: ${fmt1(c.metaLo)}–${fmt1(c.metaHi)} kg` : `meta planejada (${fmt1(c.metaLo)}–${fmt1(c.metaHi)} kg)`;
     $("stKcal").innerHTML = `${fmt0(c.kcal)} <small>kcal</small>`;
@@ -670,15 +685,20 @@
       act.hidden = false;
       const btn = $("btnApply");
       btn.disabled = !!v.locked;
-      btn.textContent = `Aplicar: ${fmt0(p.kcalAlvo + v.delta)} kcal`;
+      btn.textContent = `Aplicar: ${fmt0(c.kcal + v.delta)} kcal`;
       btn.dataset.delta = v.delta;
-      btn.dataset.motivo = `${v.tag}: ${v.title.toLowerCase()} (ritmo de ${fmt1(c.rate)} kg/sem)`;
+      btn.dataset.motivo = `${v.tag}: ${v.title.toLowerCase()} (ritmo de ${fmt1(c.rate)} kg/sem, ${nf2.format(c.ratePct)}% do peso)`;
       $("vApplyNote").textContent = v.locked ? `Liberado em ${brFull(addDays(v.lastAdj, 14))} (14 dias após o último ajuste).` : "";
     } else act.hidden = true;
 
     $("kTmb").textContent = `${fmt0(c.tmb)} kcal`;
     $("kGet").textContent = `${fmt0(c.get)} kcal`;
     $("kKcal").textContent = `${fmt0(c.kcal)} kcal`;
+    $("regraFaixa").textContent = `(${fmt1(c.avgNow * RITMO_MIN / 100)}–${fmt1(c.avgNow * RITMO_MAX / 100)} kg para você hoje)`;
+    const kgPerdidos = c.pesoRef - c.avgNow;
+    $("kKcalNota").textContent = Math.abs(kgPerdidos) >= 0.1
+      ? `${fmt0(p.kcalAlvo)} kcal com ${fmt1(c.pesoRef)} kg; ${kgPerdidos > 0 ? "−" : "+"}${fmt0(Math.abs(p.kcalAlvo - c.kcal))} kcal pelos ${fmt1(Math.abs(kgPerdidos))} kg ${kgPerdidos > 0 ? "perdidos" : "ganhos"} desde então.`
+      : `Definida com ${fmt1(c.pesoRef)} kg.`;
     $("kDef").textContent = `${fmt0(c.get - c.kcal)} kcal (${fmt0((c.get - c.kcal) / c.get * 100)}%)`;
     $("kP").textContent = `${c.P} g`; $("kC").textContent = `${c.C} g`; $("kG").textContent = `${c.G} g`;
     $("kAgua").textContent = `${fmt1(c.agua)} L`;
@@ -706,19 +726,47 @@
     if (!$("fData").value) $("fData").value = todayIso();
   }
 
+  // Ajusta as quantidades do cardápio-base para a meta do dia: primeiro o frango/peixe (proteína),
+  // depois o arroz/batata (calorias). O resto fica fixo. Arredonda de 10 em 10 g.
+  const MINIMO = { P: 80, C: 50 };
+  function macrosItem(it, q) { return Array.isArray(it) ? it.slice(1) : it.por100.map((v) => v * (q ?? it.q) / 100); }
+  function ajustarVertente(V, c) {
+    const itens = V.refeicoes.flatMap((r) => r[1]).filter((it) => !Array.isArray(it));
+    const q = new Map(itens.map((it) => [it, it.q]));
+    const total = () => V.refeicoes.flatMap((r) => r[1]).reduce((a, it) => macrosItem(it, q.get(it)).map((v, i) => a[i] + v), [0, 0, 0, 0]);
+    for (const [aj, idx, meta] of [["P", 1, c.P], ["C", 0, c.kcal]]) {
+      const alvo = itens.filter((it) => it.aj === aj);
+      const base = alvo.reduce((s, it) => s + macrosItem(it, q.get(it))[idx], 0);
+      const falta = meta - total()[idx];
+      for (const it of alvo) {
+        const parte = falta * macrosItem(it, q.get(it))[idx] / base; // divide na proporção do que cada item já entrega
+        const g = q.get(it) + parte / (it.por100[idx] / 100);
+        q.set(it, Math.max(MINIMO[aj], Math.round(g / 10) * 10));
+      }
+    }
+    return { q, total: total() };
+  }
   function renderMenu(c) {
     const V = VERTENTES[state.vertente];
-    const t = V.refeicoes.reduce((a, r) => [a[0] + r[2], a[1] + r[3], a[2] + r[4], a[3] + r[5]], [0, 0, 0, 0]);
+    const { q, total: t } = ajustarVertente(V, c);
+    const r0 = (v) => fmt0(v);
     let h = `<thead><tr><th>Refeição</th><th>Alimentos</th><th class="n">kcal</th><th class="n">P</th><th class="n">C</th><th class="n">G</th></tr></thead><tbody>`;
-    for (const r of V.refeicoes) h += `<tr><td class="meal">${r[0]}</td><td>${esc(r[1])}</td><td class="n">${r[2]}</td><td class="n">${r[3]}</td><td class="n">${r[4]}</td><td class="n">${r[5]}</td></tr>`;
-    h += `</tbody><tfoot><tr><td></td><td>Total da vertente</td><td class="n">${fmt0(t[0])}</td><td class="n">${t[1]}</td><td class="n">${t[2]}</td><td class="n">${t[3]}</td></tr></tfoot>`;
+    for (const [nome, itens] of V.refeicoes) {
+      const m = itens.reduce((a, it) => macrosItem(it, q.get(it)).map((v, i) => a[i] + v), [0, 0, 0, 0]);
+      const txt = itens.map((it) => {
+        if (Array.isArray(it)) return esc(it[0]);
+        const g = q.get(it);
+        const qtd = `${g} g`;
+        return `${esc(it.t)} ${g !== it.q ? `<b title="No cardápio-base: ${it.q} g">${qtd}</b>` : qtd}${it.depois ? ` ${esc(it.depois)}` : ""}`;
+      }).join(" · ");
+      h += `<tr><td class="meal">${nome}</td><td>${txt.charAt(0).toUpperCase() + txt.slice(1)}</td><td class="n">${r0(m[0])}</td><td class="n">${r0(m[1])}</td><td class="n">${r0(m[2])}</td><td class="n">${r0(m[3])}</td></tr>`;
+    }
+    h += `</tbody><tfoot><tr><td></td><td>Total do dia</td><td class="n">${r0(t[0])}</td><td class="n">${r0(t[1])}</td><td class="n">${r0(t[2])}</td><td class="n">${r0(t[3])}</td></tr>`;
+    h += `<tr><td></td><td class="muted">Sua meta de hoje</td><td class="n muted">${r0(c.kcal)}</td><td class="n muted">${c.P}</td><td class="n muted">${c.C}</td><td class="n muted">${c.G}</td></tr></tfoot>`;
     $("menuTbl").innerHTML = h;
-    const diff = c.kcal - t[0];
-    const arroz = Math.round(Math.abs(diff) / 1.28 / 10) * 10;
-    let msg;
-    if (Math.abs(diff) < 40) msg = `Esta vertente já bate com a sua meta atual de ${fmt0(c.kcal)} kcal. Siga como está.`;
-    else msg = `Sua meta atual é ${fmt0(c.kcal)} kcal (${diff > 0 ? "+" : "−"}${fmt0(Math.abs(diff))} em relação à vertente). ${diff > 0 ? "Some" : "Tire"} cerca de <b>${arroz} g de arroz</b> no dia (ou ${Math.round(arroz * 2.46 / 10) * 10} g de batata), dividindo entre almoço e jantar.`;
-    if (t[1] < c.P - 10) msg += ` A proteína da vertente (${t[1]} g) está abaixo da sua meta (${c.P} g): acrescente ~${Math.round((c.P - t[1]) / 0.32 / 10) * 10} g de frango.`;
+    let msg = `Quantidades calculadas para a sua meta de hoje (${fmt0(c.kcal)} kcal e ${c.P} g de proteína, com média de ${fmt1(c.avgNow)} kg). O frango e o peixe acompanham a proteína; o arroz e a batata fecham as calorias. Em <b>negrito</b>, o que mudou em relação ao cardápio-base.`;
+    if (t[0] - c.kcal > 60) msg += ` O arroz já está no mínimo e o dia ainda passa ${fmt0(t[0] - c.kcal)} kcal da meta: tire 1 fatia de pão ou metade do amendoim.`;
+    if (V.nota) msg += `<br><br>${V.nota}`;
     $("menuAdjust").innerHTML = msg;
     document.querySelectorAll(".seg button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === state.vertente)));
   }
@@ -849,7 +897,7 @@
     let h = `<div class="adj"><span class="num">${brFull(p.dataInicio)}</span><span>Início do plano (revisão em PDF)</span><b class="num">2.000 kcal</b></div>`;
     for (const a of state.ajustes) h += `<div class="adj"><span class="num">${brFull(a.data)}</span><span>${esc(a.motivo)}</span><b class="num">${fmt0(a.kcalDepois)} kcal</b></div>`;
     box.innerHTML = h;
-    if (!$("mKcal").value) $("mKcal").value = p.kcalAlvo;
+    if (!$("mKcal").value) $("mKcal").value = compute().kcal;
   }
 
   function fillProfileForm() {
@@ -909,13 +957,16 @@
 
   async function applyKcal(nova, motivo) {
     const p = state.profile;
-    const a = { id: `${todayIso()}-${Date.now()}`, data: todayIso(), ts: new Date().toISOString(), kcalAntes: p.kcalAlvo, kcalDepois: nova, motivo };
+    const c = compute();
+    // A nova meta passa a valer para o peso de hoje (é a referência para a meta acompanhar o peso).
+    const pesoRef = Math.round(c.avgNow * 10) / 10;
+    const a = { id: `${todayIso()}-${Date.now()}`, data: todayIso(), ts: new Date().toISOString(), kcalAntes: c.kcal, kcalDepois: nova, pesoRef, motivo };
     await store.addAjuste(a);
-    await store.saveProfile({ ...p, kcalAlvo: nova });
+    await store.saveProfile({ ...p, kcalAlvo: nova, pesoRefKcal: pesoRef });
   }
   $("btnApply").addEventListener("click", async () => {
     const b = $("btnApply"); const d = Number(b.dataset.delta);
-    try { b.disabled = true; await applyKcal(state.profile.kcalAlvo + d, b.dataset.motivo); $("vApplyNote").textContent = "Meta atualizada."; }
+    try { b.disabled = true; await applyKcal(compute().kcal + d, b.dataset.motivo); $("vApplyNote").textContent = "Meta atualizada."; }
     catch { $("vApplyNote").textContent = "Não foi possível salvar o ajuste. Tente de novo."; b.disabled = false; }
   });
   $("manualAdj").addEventListener("submit", async (e) => {
