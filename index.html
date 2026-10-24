@@ -130,6 +130,8 @@
   .p-warn { background: var(--warn-soft); color: var(--warn); }
   .p-crit { background: var(--crit-soft); color: var(--crit); }
   .p-info { background: var(--accent-soft); color: var(--accent); }
+  .p-dexa { background: var(--coral-soft); color: var(--coral); }
+  .hist-tbl tr.row-dexa td { background: var(--coral-soft); }
   .verdict { display: grid; gap: 8px; padding: 14px; border-radius: 12px; background: var(--surface-2); }
   .verdict h3 { font-size: 1.15rem; }
 
@@ -228,7 +230,13 @@
 
   <!-- REGISTRAR -->
   <section class="block" id="hoje">
-    <div class="head"><h2>Registrar o dia</h2><span class="muted small">Peso em jejum, depois do banheiro. Um registro por data; salvar de novo atualiza.</span></div>
+    <div class="head"><h2>Registrar o dia</h2>
+      <div class="seg" role="group" aria-label="Tipo de medição" id="modeSeg">
+        <button type="button" data-mode="bio" aria-pressed="true">Bioimpedância</button>
+        <button type="button" data-mode="dexa" aria-pressed="false">DEXA</button>
+      </div>
+    </div>
+    <p class="muted small" id="modeHint">Peso em jejum, depois do banheiro. Um registro por data; salvar de novo atualiza.</p>
     <div class="panel">
       <form class="entry" id="entryForm" autocomplete="off">
         <div class="field"><label for="fData">Data</label><input type="date" id="fData" required></div>
@@ -263,6 +271,30 @@
           <button type="submit" class="btn-primary" id="btnSave">Salvar registro</button>
           <button type="button" class="btn-ghost" id="btnClear">Limpar</button>
           <span class="toast" id="saveMsg" role="status"></span>
+        </div>
+      </form>
+      <form class="entry" id="dexaForm" autocomplete="off" hidden>
+        <div class="field"><label for="dData">Data do exame</label><input type="date" id="dData" required></div>
+        <div class="field"><label for="dPeso">Peso (kg)</label><input type="number" id="dPeso" step="0.1" min="30" max="250" inputmode="decimal"></div>
+        <div class="field"><label for="dBf">Gordura total (%)</label><input type="number" id="dBf" step="0.1" min="3" max="60" inputmode="decimal" required></div>
+        <div class="field"><label for="dGordKg">Massa gorda (kg)</label><input type="number" id="dGordKg" step="0.001" min="1" max="150" inputmode="decimal"></div>
+        <div class="field"><label for="dMagraKg">Massa magra (kg)</label><input type="number" id="dMagraKg" step="0.001" min="10" max="150" inputmode="decimal"></div>
+        <div class="field"><label for="dFfm">Massa livre de gordura (kg)</label><input type="number" id="dFfm" step="0.001" min="10" max="150" inputmode="decimal"></div>
+        <div class="field"><label for="dBmc">Mineral ósseo, BMC (kg)</label><input type="number" id="dBmc" step="0.001" min="0.5" max="10" inputmode="decimal"></div>
+        <div class="field"><label for="dDmo">DMO total (g/cm²)</label><input type="number" id="dDmo" step="0.001" min="0.3" max="3" inputmode="decimal"></div>
+        <div class="field"><label for="dT">T-score</label><input type="number" id="dT" step="0.1" min="-6" max="6" inputmode="decimal"></div>
+        <div class="field"><label for="dZ">Z-score</label><input type="number" id="dZ" step="0.1" min="-6" max="6" inputmode="decimal"></div>
+        <div class="field"><label for="dVat">Gordura visceral (g)</label><input type="number" id="dVat" step="1" min="0" max="10000" inputmode="numeric"></div>
+        <div class="field"><label for="dRmr">TMB do laudo (kcal)</label><input type="number" id="dRmr" step="1" min="800" max="4000" inputmode="numeric"></div>
+        <div class="field"><label for="dAndro">Androide (% gordura)</label><input type="number" id="dAndro" step="0.1" min="1" max="70" inputmode="decimal"></div>
+        <div class="field"><label for="dGino">Ginoide (% gordura)</label><input type="number" id="dGino" step="0.1" min="1" max="70" inputmode="decimal"></div>
+        <div class="field"><label for="dAlm">Massa magra apendicular (kg)</label><input type="number" id="dAlm" step="0.001" min="5" max="80" inputmode="decimal"></div>
+        <div class="field"><label for="dRsmi">RSMI (kg/m²)</label><input type="number" id="dRsmi" step="0.01" min="3" max="20" inputmode="decimal"></div>
+        <div class="field full"><label for="dNota">Notas do exame</label><textarea id="dNota" placeholder="Clínica, aparelho, horário, jejum…"></textarea></div>
+        <div class="actions">
+          <button type="submit" class="btn-primary" id="btnSaveDexa">Salvar DEXA</button>
+          <button type="button" class="btn-ghost" id="btnClearDexa">Limpar</button>
+          <span class="toast" id="dexaMsg" role="status"></span>
         </div>
       </form>
     </div>
@@ -300,7 +332,9 @@
         <dl class="kv" id="kvPlan">
           <dt>TMB (Mifflin-St Jeor)</dt><dd id="kTmb">—</dd>
           <dt>TMB da balança</dt><dd id="kTmbBio">—</dd>
-          <dt>Gasto total estimado</dt><dd id="kGet">—</dd>
+          <dt>TMB corrigida</dt><dd id="kTmbCorr">—</dd>
+          <dt>TMB do DEXA</dt><dd id="kTmbDexa">—</dd>
+          <dt id="kGetLbl">Gasto total estimado</dt><dd id="kGet">—</dd>
           <dt>Meta calórica</dt><dd id="kKcal">—</dd>
           <dt></dt><dd class="small muted" id="kKcalNota"></dd>
           <dt>Déficit estimado</dt><dd id="kDef">—</dd>
@@ -332,8 +366,12 @@
     </div>
     <div class="minis">
       <div class="panel"><div class="head"><h3>Sono</h3><span class="muted small">meta: 7,5–8 h</span></div><div class="chart-box" id="sChart"></div></div>
-      <div class="panel"><div class="head"><h3>Gordura corporal</h3><span class="muted small">bioimpedância, %</span></div><div class="chart-box" id="bfChart"></div></div>
-      <div class="panel"><div class="head"><h3>Massa muscular</h3><span class="muted small">bioimpedância, kg</span></div><div class="chart-box" id="mmChart"></div></div>
+      <div class="panel"><div class="head"><h3>Gordura corporal</h3><span class="muted small" id="bfSub">bioimpedância, %</span></div><div class="chart-box" id="bfChart"></div></div>
+      <div class="panel"><div class="head"><h3 id="mmTitle">Massa muscular</h3><span class="muted small" id="mmSub">bioimpedância, kg</span></div><div class="chart-box" id="mmChart"></div></div>
+    </div>
+    <div class="panel">
+      <div class="head"><h3>Densitometria (DEXA)</h3><span class="muted small">o exame mais recente corrige a balança</span></div>
+      <div id="dexaBox"></div>
     </div>
     <div class="panel">
       <div class="head"><h3>Cintura</h3><span class="muted small">referência para homens: abaixo de 94 cm</span></div>
@@ -486,14 +524,15 @@
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
   // ---------- estado ----------
-  const state = { profile: { ...DEFAULT_PROFILE }, profileSaved: false, logs: new Map(), ajustes: [], vertente: "A", ready: false };
+  const state = { profile: { ...DEFAULT_PROFILE }, profileSaved: false, logs: new Map(), dexa: new Map(), ajustes: [], vertente: "A", cal: null, ready: false };
 
-  // ---------- armazenamento (Firestore: users/{uid} + subcoleções logs e ajustes) ----------
+  // ---------- armazenamento (Firestore: users/{uid} + subcoleções logs, dexa e ajustes) ----------
   let store = null;
 
   function dbStore(db, uid) {
     const profRef = db.collection("users").doc(uid);
     const logsCol = profRef.collection("logs");
+    const dexaCol = profRef.collection("dexa");
     const adjCol = profRef.collection("ajustes");
     const unsubs = [];
     return {
@@ -501,6 +540,7 @@
       start(onPart) {
         unsubs.push(profRef.onSnapshot((s) => onPart({ profile: s.exists ? s.data() : null }), onErr));
         unsubs.push(logsCol.onSnapshot((q) => { const o = {}; q.docs.forEach((d) => { o[d.id] = d.data(); }); onPart({ logs: o }); }, onErr));
+        unsubs.push(dexaCol.onSnapshot((q) => { const o = {}; q.docs.forEach((d) => { o[d.id] = d.data(); }); onPart({ dexa: o }); }, onErr));
         unsubs.push(adjCol.onSnapshot((q) => onPart({ ajustes: q.docs.map((d) => d.data()) }), onErr));
       },
       stop() { unsubs.splice(0).forEach((u) => u()); },
@@ -508,11 +548,14 @@
       saveProfile: (p) => { profRef.set(p).catch(onErr); return Promise.resolve(); },
       saveLog: (l) => { logsCol.doc(l.data).set(l).catch(onErr); return Promise.resolve(); },
       deleteLog: (d) => { logsCol.doc(d).delete().catch(onErr); return Promise.resolve(); },
+      saveDexa: (x) => { dexaCol.doc(x.data).set(x).catch(onErr); return Promise.resolve(); },
+      deleteDexa: (d) => { dexaCol.doc(d).delete().catch(onErr); return Promise.resolve(); },
       addAjuste: (a) => { adjCol.doc(a.id).set(a).catch(onErr); return Promise.resolve(); },
       async importAll(o) {
         const b = db.batch();
         if (o.profile) b.set(profRef, o.profile);
         for (const l of Object.values(o.logs || {})) if (l && l.data) b.set(logsCol.doc(l.data), l);
+        for (const x of Object.values(o.dexa || {})) if (x && x.data) b.set(dexaCol.doc(x.data), x);
         for (const a of o.ajustes || []) if (a && a.id) b.set(adjCol.doc(a.id), a);
         await b.commit();
       }
@@ -532,6 +575,7 @@
       $("mKcal").value = ""; // o render preenche com a meta de hoje
     }
     if ("logs" in part) { state.logs = new Map(Object.entries(part.logs).sort((a, b) => a[0] < b[0] ? -1 : 1)); }
+    if ("dexa" in part) { state.dexa = new Map(Object.entries(part.dexa).sort((a, b) => a[0] < b[0] ? -1 : 1)); }
     if ("ajustes" in part) { state.ajustes = [...part.ajustes].sort((a, b) => (a.data + (a.ts || "")) < (b.data + (b.ts || "")) ? -1 : 1); }
     state.ready = true;
     render();
@@ -573,7 +617,7 @@
       $("loginView").hidden = true;
       $("appView").hidden = false;
       state.nome = (user.displayName || "").split(" ")[0];
-      state.profile = { ...DEFAULT_PROFILE }; state.logs = new Map(); state.ajustes = [];
+      state.profile = { ...DEFAULT_PROFILE }; state.logs = new Map(); state.dexa = new Map(); state.ajustes = [];
       store = dbStore(db, user.uid);
       store.start(ingest);
       updateNet();
@@ -600,6 +644,33 @@
   function rolling(ws) {
     return ws.map((w) => ({ d: w.d, v: avgWindow(ws, w.d) })).filter((x) => x.v != null);
   }
+  // ---- correção da balança pelo DEXA ----
+  // O DEXA mais recente é a referência. Ele é comparado com a bioimpedância do mesmo dia (ou a mais próxima,
+  // até 3 dias): gordura vira uma diferença em pontos de %, massa magra e TMB viram razões.
+  // Os valores crus da balança nunca são alterados; a correção é aplicada só na hora de mostrar.
+  function calib() {
+    const ds = [...state.dexa.values()];
+    const d = ds[ds.length - 1];
+    if (!d) return null;
+    // média das medições da balança até 3 dias do exame (a bioimpedância oscila de um dia para o outro)
+    const perto = (campo) => {
+      const ls = [...state.logs.values()].filter((l) => l[campo] != null && Math.abs(diffDays(d.data, l.data)) <= 3);
+      return ls.length ? { refs: ls.map((l) => l.data), bal: ls.reduce((a, l) => a + l[campo], 0) / ls.length } : null;
+    };
+    const lb = perto("bf"), lm = perto("musculo"), lt = perto("tmbBio");
+    return {
+      d,
+      bf: d.bf != null && lb ? { ...lb, off: d.bf - lb.bal } : null,
+      musculo: d.magraKg != null && lm ? { ...lm, k: d.magraKg / lm.bal } : null,
+      tmbBio: d.rmr != null && lt ? { ...lt, k: d.rmr / lt.bal } : null
+    };
+  }
+  function corr(cal, campo, v) {
+    const f = cal && cal[campo];
+    if (v == null || !f) return v;
+    return f.off != null ? v + f.off : v * f.k;
+  }
+
   function lastDate() { const k = [...state.logs.keys()]; return k.length ? k[k.length - 1] : null; }
   function lastWeightDate() { const ws = weights(); return ws.length ? ws[ws.length - 1].d : null; }
 
@@ -617,7 +688,12 @@
     const metaLo = p.pesoInicio * (1 - RITMO_MAX / 100) ** weeksTotal;
     const ratePct = rate != null ? rate / avgNow * 100 : null;
     const proj = rate != null ? avgNow - rate * weeksLeft : null;
-    const tmb = 10 * avgNow + 6.25 * p.altura - 5 * p.idade + (p.sexo === "F" ? -161 : 5);
+    const tmbMifflin = 10 * avgNow + 6.25 * p.altura - 5 * p.idade + (p.sexo === "F" ? -161 : 5);
+    // Com DEXA, o gasto parte da TMB da última bioimpedância corrigida; sem DEXA, da fórmula de Mifflin.
+    const cal = calib();
+    const ultTmb = [...state.logs.values()].reverse().find((l) => l.tmbBio != null);
+    const tmbCorr = cal && cal.tmbBio && ultTmb ? { v: corr(cal, "tmbBio", ultTmb.tmbBio), data: ultTmb.data } : null;
+    const tmb = tmbCorr ? tmbCorr.v : tmbMifflin;
     const get = tmb * p.fator;
     // A meta salva vale para o peso do último ajuste (pesoRefKcal). Conforme o peso cai, o gasto cai
     // junto (10 kcal/kg × fator de atividade) e a meta acompanha, mantendo o mesmo déficit.
@@ -626,7 +702,7 @@
     const P = round5(p.protGkg * avgNow);
     const G = Math.max(p.gordMin, round5(0.8 * avgNow));
     const C = Math.max(0, Math.round((kcal - 4 * P - 9 * G) / 4));
-    return { ws, lwd, avgNow, rate, ratePct, pesoRef, weeksLeft, weeksTotal, metaHi, metaLo, proj, tmb, get, kcal, P, G, C, agua: avgNow * 0.042 };
+    return { ws, lwd, avgNow, rate, ratePct, pesoRef, weeksLeft, weeksTotal, metaHi, metaLo, proj, tmb, tmbMifflin, tmbCorr, cal, get, kcal, P, G, C, agua: avgNow * 0.042 };
   }
 
   function decide(c) {
@@ -653,6 +729,7 @@
     const p = state.profile;
     const c = compute();
     const ref = c.lwd || todayIso();
+    state.cal = c.cal;
 
     // topo
     $("eyebrow").textContent = `Projeto até ${br(p.dataMeta)}${state.nome ? ` · ${state.nome}` : ""}`;
@@ -685,9 +762,12 @@
       $("vApplyNote").textContent = v.locked ? `Liberado em ${brFull(addDays(v.lastAdj, 14))} (14 dias após o último ajuste).` : "";
     } else act.hidden = true;
 
-    $("kTmb").textContent = `${fmt0(c.tmb)} kcal`;
+    $("kTmb").textContent = `${fmt0(c.tmbMifflin)} kcal`;
     const bio = [...state.logs.values()].reverse().find((l) => l.tmbBio != null);
     $("kTmbBio").textContent = bio ? `${fmt0(bio.tmbBio)} kcal (${br(bio.data)})` : "registre no dia";
+    $("kTmbCorr").textContent = c.tmbCorr ? `${fmt0(c.tmbCorr.v)} kcal (${br(c.tmbCorr.data)})` : c.cal ? "sem balança até 3 dias do exame" : "registre um DEXA";
+    $("kTmbDexa").textContent = c.cal && c.cal.d.rmr != null ? `${fmt0(c.cal.d.rmr)} kcal (${br(c.cal.d.data)})` : "—";
+    $("kGetLbl").textContent = c.tmbCorr ? "Gasto total (corrigido)" : "Gasto total estimado";
     $("kGet").textContent = `${fmt0(c.get)} kcal`;
     $("kKcal").textContent = `${fmt0(c.kcal)} kcal`;
     $("regraFaixa").textContent = `(${fmt1(c.avgNow * RITMO_MIN / 100)}–${fmt1(c.avgNow * RITMO_MAX / 100)} kg para você hoje)`;
@@ -711,8 +791,12 @@
     // gráficos
     renderWeight(c);
     renderMini("sChart", "sono", { target: 8, unit: "h", max: 10, fmt: fmt1 });
-    renderLinha("bfChart", "bf", { unit: "%", desce: true });
-    renderLinha("mmChart", "musculo", { unit: " kg", desce: false });
+    renderLinha("bfChart", "bf", { unit: "%", desce: true, dexa: "bf" });
+    renderLinha("mmChart", "musculo", { unit: " kg", desce: false, dexa: "magraKg" });
+    $("bfSub").textContent = c.cal && c.cal.bf ? `corrigida pelo DEXA de ${br(c.cal.d.data)}, %` : "bioimpedância, %";
+    $("mmTitle").textContent = c.cal && c.cal.musculo ? "Massa magra" : "Massa muscular";
+    $("mmSub").textContent = c.cal && c.cal.musculo ? `balança na escala do DEXA de ${br(c.cal.d.data)}, kg` : "bioimpedância, kg";
+    renderDexa();
     renderWaist();
     $("progSub").textContent = `De ${brFull(p.dataInicio)} até ${brFull(p.dataMeta)} · meta de ${fmt1(c.metaLo)}–${fmt1(c.metaHi)} kg`;
     // histórico, ajustes, perfil
@@ -764,7 +848,7 @@
     if (t[0] - c.kcal > 60) msg += ` O arroz já está no mínimo e o dia ainda passa ${fmt0(t[0] - c.kcal)} kcal da meta: tire 1 fatia de pão ou metade do amendoim.`;
     if (V.nota) msg += `<br><br>${V.nota}`;
     $("menuAdjust").innerHTML = msg;
-    document.querySelectorAll(".seg button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === state.vertente)));
+    document.querySelectorAll("#cardapio .seg button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === state.vertente)));
   }
 
   // ---- gráfico de peso ----
@@ -852,25 +936,45 @@
   }
 
   // ---- linha de composição corporal (desde o início; escala só na faixa dos valores) ----
+  // Linha = balança (corrigida pelo DEXA, se houver); quadrados = exames DEXA a partir de 1 mês antes do início.
   function renderLinha(id, field, o) {
     const box = $(id);
+    const cal = state.cal, corrigido = !!(cal && cal[field]);
     const pts = [];
-    for (const [d, l] of state.logs) if (l[field] != null) pts.push({ d, v: l[field] });
-    if (!pts.length) { box.innerHTML = `<div class="empty small"><b>Sem dados</b><span>Aparece depois da primeira medição na bioimpedância.</span></div>`; return; }
-    const W = 300, H = 130, m = { l: 34, r: 8, t: 10, b: 20 };
-    const x0 = pts[0].d, x1 = pts[pts.length - 1].d, span = Math.max(1, diffDays(x0, x1));
-    const vs = pts.map((x) => x.v);
+    for (const [d, l] of state.logs) if (l[field] != null) pts.push({ d, v: corr(cal, field, l[field]), raw: l[field] });
+    const desde = addDays(state.profile.dataInicio, -30);
+    const dx = [];
+    for (const [d, x] of state.dexa) if (x[o.dexa] != null && d >= desde) dx.push({ d, v: x[o.dexa] });
+    if (!pts.length && !dx.length) { box.innerHTML = `<div class="empty small"><b>Sem dados</b><span>Aparece depois da primeira medição na bioimpedância.</span></div>`; return; }
+    const ds = [...pts, ...dx].map((x) => x.d).sort();
+    const W = 300, H = 140, m = { l: 34, r: 8, t: 18, b: 20 };
+    const x0 = ds[0], x1 = ds[ds.length - 1], span = Math.max(1, diffDays(x0, x1));
+    const vs = [...pts, ...dx].map((x) => x.v);
     const yMin = Math.floor(Math.min(...vs) - 1), yMax = Math.ceil(Math.max(...vs) + 1);
-    const X = (d) => pts.length === 1 ? (m.l + W - m.r) / 2 : m.l + diffDays(x0, d) / span * (W - m.l - m.r);
+    const X = (d) => x0 === x1 ? (m.l + W - m.r) / 2 : m.l + diffDays(x0, d) / span * (W - m.l - m.r);
     const Y = (v) => m.t + (1 - (v - yMin) / (yMax - yMin)) * (H - m.t - m.b);
     let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${field} ao longo do tempo">`;
     for (const v of [yMin, (yMin + yMax) / 2, yMax]) s += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${m.l - 4}" y="${Y(v) + 4}" text-anchor="end">${fmt1(v)}</text>`;
+    // linha vertical tracejada no dia de cada DEXA
+    for (const x of dx) s += `<line x1="${X(x.d).toFixed(1)}" x2="${X(x.d).toFixed(1)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--coral)" stroke-dasharray="3 3" opacity=".7"/><text x="${X(x.d).toFixed(1)}" y="${m.t - 5}" text-anchor="middle" style="fill:var(--coral);font-weight:700">DEXA</text>`;
     if (pts.length > 1) s += `<path d="${pts.map((x, i) => `${i ? "L" : "M"}${X(x.d).toFixed(1)},${Y(x.v).toFixed(1)}`).join(" ")}" fill="none" stroke="var(--accent)" stroke-width="2"/>`;
-    for (const x of pts) s += `<circle cx="${X(x.d).toFixed(1)}" cy="${Y(x.v).toFixed(1)}" r="3.5" fill="var(--accent)"><title>${brFull(x.d)}: ${fmt1(x.v)}${o.unit}</title></circle>`;
-    s += `<text x="${m.l}" y="${H - 4}">${br(x0)}</text><text x="${W - m.r}" y="${H - 4}" text-anchor="end">${br(x1)}</text></svg>`;
-    const ult = pts[pts.length - 1], dif = ult.v - pts[0].v;
-    const bom = o.desce ? dif < 0 : dif > 0;
-    s += `<p class="small muted">Última: <b class="num" style="color:var(--ink)">${fmt1(ult.v)}${o.unit}</b>${pts.length > 1 ? ` · <span style="color:var(${Math.abs(dif) < 0.05 ? "--muted" : bom ? "--good" : "--coral"})">${dif > 0 ? "+" : "−"}${fmt1(Math.abs(dif))}${o.unit}</span> desde ${br(pts[0].d)}` : ""}</p>`;
+    for (const x of pts) s += `<circle cx="${X(x.d).toFixed(1)}" cy="${Y(x.v).toFixed(1)}" r="3.5" fill="var(--accent)"><title>${brFull(x.d)}: ${fmt1(x.v)}${o.unit}${corrigido ? ` (balança: ${fmt1(x.raw)}${o.unit})` : ""}</title></circle>`;
+    for (const x of dx) s += `<rect x="${(X(x.d) - 4.5).toFixed(1)}" y="${(Y(x.v) - 4.5).toFixed(1)}" width="9" height="9" rx="1.5" fill="var(--coral)" stroke="var(--surface)" stroke-width="1.5"><title>DEXA ${brFull(x.d)}: ${fmt1(x.v)}${o.unit}</title></rect>`;
+    // data embaixo de cada medição (DEXA primeiro; pula as que encostariam numa já escrita)
+    const marcas = [...dx.map((x) => ({ d: x.d, dexa: true })), ...pts.map((x) => ({ d: x.d }))];
+    const usados = [];
+    for (const k of marcas) {
+      const px = X(k.d);
+      if (usados.some((u) => Math.abs(u - px) < 26)) continue;
+      usados.push(px);
+      s += `<text x="${Math.min(W - m.r - 12, Math.max(m.l + 12, px)).toFixed(1)}" y="${H - 4}" text-anchor="middle"${k.dexa ? ` style="fill:var(--coral);font-weight:700"` : ""}>${br(k.d)}</text>`;
+    }
+    s += `</svg><div class="legend"><span><i class="sw dot" style="background:var(--accent)"></i>Bioimpedância${corrigido ? " (corrigida)" : ""}</span>${dx.length ? `<span><i class="sw dot" style="background:var(--coral);border-radius:2px"></i>DEXA</span>` : ""}</div>`;
+    if (pts.length) {
+      const ult = pts[pts.length - 1], dif = ult.v - pts[0].v;
+      const bom = o.desce ? dif < 0 : dif > 0;
+      s += `<p class="small muted">Última: <b class="num" style="color:var(--ink)">${fmt1(ult.v)}${o.unit}</b>${corrigido ? ` (balança: ${fmt1(ult.raw)})` : ""}${pts.length > 1 ? ` · <span style="color:var(${Math.abs(dif) < 0.05 ? "--muted" : bom ? "--good" : "--coral"})">${dif > 0 ? "+" : "−"}${fmt1(Math.abs(dif))}${o.unit}</span> desde ${br(pts[0].d)}` : ""}</p>`;
+    }
     if (field === "bf") {
       const l = [...state.logs.values()].reverse().find((x) => x.visceral != null || x.idadeCorp != null);
       if (l) s += `<p class="small muted">${[l.visceral != null ? `Visceral: <b>${fmt1(l.visceral)}</b>` : "", l.idadeCorp != null ? `idade corporal: <b>${l.idadeCorp}</b> anos` : ""].filter(Boolean).join(" · ")} (${br(l.data)})</p>`;
@@ -902,16 +1006,59 @@
   }
 
   function renderHistory() {
-    const rows = [...state.logs.values()].sort((a, b) => a.data < b.data ? 1 : -1);
+    // dias da balança e exames DEXA na mesma lista, do mais novo para o mais antigo
+    const rows = [...state.logs.values(), ...[...state.dexa.values()].map((x) => ({ ...x, dexa: true }))]
+      .sort((a, b) => a.data !== b.data ? (a.data < b.data ? 1 : -1) : (a.dexa ? -1 : 1));
     $("histCount").textContent = rows.length ? `${rows.length} registro${rows.length > 1 ? "s" : ""}` : "";
     const wrap = $("histWrap");
     if (!rows.length) { wrap.innerHTML = `<div class="empty"><b>Nenhum registro ainda</b><span>Preencha "Registrar o dia" acima. Cada dia aparece aqui e alimenta os gráficos.</span></div>`; return; }
-    let h = `<table class="hist-tbl"><thead><tr><th>Data</th><th class="n">Peso</th><th class="n">Gord. %</th><th class="n">Músculo</th><th class="n">Visceral</th><th class="n">Sono</th><th class="n">Cintura</th><th>Treino</th><th>Cardápio</th><th>Ferro</th><th>Notas</th><th></th></tr></thead><tbody>`;
+    const cal = state.cal;
+    // Com DEXA: valor corrigido em destaque e o da balança entre parênteses.
+    const cel = (campo, v) => v == null || !(cal && cal[campo]) ? fmt1(v) : `${fmt1(corr(cal, campo, v))} <span class="muted small">(${fmt1(v)})</span>`;
+    let h = `<table class="hist-tbl"><thead><tr><th>Data</th><th>Medição</th><th class="n">Peso</th><th class="n">Gord. %${cal && cal.bf ? "*" : ""}</th><th class="n">${cal && cal.musculo ? "Massa magra*" : "Músculo"}</th><th class="n">Visceral</th><th class="n">Sono</th><th class="n">Cintura</th><th>Treino</th><th>Cardápio</th><th>Ferro</th><th>Notas</th><th></th></tr></thead><tbody>`;
     for (const l of rows) {
-      h += `<tr><td class="num">${brFull(l.data)}</td><td class="n">${fmt1(l.peso)}</td><td class="n">${fmt1(l.bf)}</td><td class="n">${fmt1(l.musculo)}</td><td class="n">${fmt1(l.visceral)}</td><td class="n">${fmt1(l.sono)}</td><td class="n">${fmt1(l.cintura)}</td><td>${esc(l.treino || "—")}</td><td>${esc(l.vertente || "—")}</td><td>${l.ferro ? "✓" : "—"}</td><td class="small">${esc(l.nota || "")}</td>
+      if (l.dexa) {
+        h += `<tr class="row-dexa"><td class="num">${brFull(l.data)}</td><td><span class="pill p-dexa">DEXA</span></td><td class="n">${fmt1(l.peso)}</td><td class="n">${fmt1(l.bf)}</td><td class="n">${fmt1(l.magraKg)}</td><td class="n">${l.vatG != null ? `${Math.round(l.vatG)} g` : "—"}</td><td class="n">—</td><td class="n">—</td><td>—</td><td>—</td><td>—</td><td class="small">${esc(l.nota || "Densitometria: valor de referência")}</td>
+      <td style="white-space:nowrap"><button class="btn-ghost btn-sm" data-dedit="${l.data}">Editar</button> <button class="btn-danger btn-sm" data-ddel="${l.data}">Excluir</button></td></tr>`;
+        continue;
+      }
+      const bio = l.bf != null || l.musculo != null || l.tmbBio != null;
+      h += `<tr><td class="num">${brFull(l.data)}</td><td>${bio ? `<span class="pill p-info">Bioimpedância</span>` : `<span class="muted small">Só balança</span>`}</td><td class="n">${fmt1(l.peso)}</td><td class="n">${cel("bf", l.bf)}</td><td class="n">${cel("musculo", l.musculo)}</td><td class="n">${fmt1(l.visceral)}</td><td class="n">${fmt1(l.sono)}</td><td class="n">${fmt1(l.cintura)}</td><td>${esc(l.treino || "—")}</td><td>${esc(l.vertente || "—")}</td><td>${l.ferro ? "✓" : "—"}</td><td class="small">${esc(l.nota || "")}</td>
       <td style="white-space:nowrap"><button class="btn-ghost btn-sm" data-edit="${l.data}">Editar</button> <button class="btn-danger btn-sm" data-del="${l.data}">Excluir</button></td></tr>`;
     }
-    wrap.innerHTML = h + `</tbody></table>`;
+    wrap.innerHTML = h + `</tbody></table>` + (cal && (cal.bf || cal.musculo) ? `<p class="small muted" style="padding:8px 10px 0">* Bioimpedância corrigida pelo DEXA de ${brFull(cal.d.data)}; entre parênteses, o número da balança. Nas linhas DEXA, o valor do próprio exame (visceral em gramas).</p>` : "");
+  }
+
+  function renderDexa() {
+    const box = $("dexaBox");
+    const ds = [...state.dexa.values()].reverse();
+    if (!ds.length) { box.innerHTML = `<div class="empty small"><b>Nenhum DEXA registrado</b><span>Em "Registrar o dia", troque a chave para DEXA e copie os números do laudo. A partir daí, a balança passa a ser corrigida.</span></div>`; return; }
+    const d = ds[0], cal = state.cal;
+    const ag = d.androide != null && d.ginoide != null ? d.androide / d.ginoide : null;
+    const kg = (v) => v == null ? "—" : `${fmt1(v)} kg`;
+    let s = `<div class="grid"><div class="c6"><dl class="kv">
+      <dt>Exame</dt><dd>${brFull(d.data)}</dd>
+      <dt>Gordura total</dt><dd>${fmt1(d.bf)}%</dd>
+      <dt>Massa gorda</dt><dd>${kg(d.gordKg)}</dd>
+      <dt>Massa magra</dt><dd>${kg(d.magraKg)}</dd>
+      <dt>Livre de gordura</dt><dd>${kg(d.livreGordKg)}</dd>
+      <dt>Gordura visceral</dt><dd>${d.vatG == null ? "—" : `${fmt0(d.vatG)} g`}</dd>
+      <dt>Androide / ginoide</dt><dd>${fmt1(d.androide)}% / ${fmt1(d.ginoide)}%${ag ? ` (A/G ${nf2.format(ag)})` : ""}</dd>
+      <dt>Magra apendicular</dt><dd>${kg(d.almKg)}${d.rsmi != null ? ` · RSMI ${nf2.format(d.rsmi)}` : ""}</dd>
+      <dt>DMO total</dt><dd>${d.dmo == null ? "—" : `${new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 3 }).format(d.dmo)} g/cm²`}${d.tScore != null ? ` · T ${fmt1(d.tScore)}` : ""}${d.zScore != null ? ` · Z ${fmt1(d.zScore)}` : ""}</dd>
+      <dt>TMB do laudo</dt><dd>${d.rmr == null ? "—" : `${fmt0(d.rmr)} kcal`}</dd>
+    </dl></div><div class="c6" style="display:grid;gap:10px;align-content:start">`;
+    const sem = "sem medição da balança até 3 dias do exame";
+    s += `<h3>Correção da balança</h3><dl class="kv">
+      <dt>Gordura</dt><dd>${cal.bf ? `${cal.bf.off >= 0 ? "+" : "−"}${fmt1(Math.abs(cal.bf.off))} pontos` : "—"}</dd>
+      <dt>Massa magra</dt><dd>${cal.musculo ? `músculo × ${nf2.format(cal.musculo.k)}` : "—"}</dd>
+      <dt>TMB</dt><dd>${cal.tmbBio ? `× ${nf2.format(cal.tmbBio.k)}` : "—"}</dd>
+    </dl>`;
+    const refs = [...new Set([cal.bf, cal.musculo, cal.tmbBio].flatMap((f) => (f ? f.refs : [])))].sort();
+    s += `<p class="small muted">${refs.length ? `Comparação: DEXA de ${brFull(d.data)} × média da balança em ${refs.map(br).join(", ")}${cal.bf ? ` (${fmt1(cal.bf.bal)}% na balança contra ${fmt1(d.bf)}% no DEXA)` : ""}. Vale para todos os registros, antigos e novos, até o próximo DEXA.` : `Ainda não há correção: ${sem}.`}</p>`;
+    s += `<div class="scroll-x"><table class="hist-tbl"><thead><tr><th>Exames</th><th class="n">Peso</th><th class="n">Gord. %</th><th class="n">Magra</th><th></th></tr></thead><tbody>`;
+    for (const x of ds) s += `<tr><td class="num">${brFull(x.data)}</td><td class="n">${fmt1(x.peso)}</td><td class="n">${fmt1(x.bf)}</td><td class="n">${fmt1(x.magraKg)}</td><td style="white-space:nowrap"><button class="btn-ghost btn-sm" data-dedit="${x.data}">Editar</button> <button class="btn-danger btn-sm" data-ddel="${x.data}">Excluir</button></td></tr>`;
+    box.innerHTML = s + `</tbody></table></div></div></div>`;
   }
 
   function renderAjustes() {
@@ -979,7 +1126,52 @@
       try { await store.deleteLog(del.dataset.del); } catch { onErr({}); }
     }
   });
-  document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => { state.vertente = b.dataset.v; renderMenu(compute()); }));
+  document.querySelectorAll("#cardapio .seg button").forEach((b) => b.addEventListener("click", () => { state.vertente = b.dataset.v; renderMenu(compute()); }));
+
+  // ---------- DEXA ----------
+  const DEXA_CAMPOS = [["dPeso", "peso"], ["dBf", "bf"], ["dGordKg", "gordKg"], ["dMagraKg", "magraKg"], ["dFfm", "livreGordKg"], ["dBmc", "bmcKg"],
+    ["dDmo", "dmo"], ["dT", "tScore"], ["dZ", "zScore"], ["dVat", "vatG"], ["dRmr", "rmr"], ["dAndro", "androide"], ["dGino", "ginoide"], ["dAlm", "almKg"], ["dRsmi", "rsmi"]];
+  function setMode(m) {
+    document.querySelectorAll("#modeSeg button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === m)));
+    $("entryForm").hidden = m !== "bio";
+    $("dexaForm").hidden = m !== "dexa";
+    $("modeHint").textContent = m === "bio"
+      ? "Peso em jejum, depois do banheiro. Um registro por data; salvar de novo atualiza."
+      : "Copie os números do laudo. O DEXA mais recente vira a referência que corrige gordura, massa magra e TMB da balança.";
+  }
+  document.querySelectorAll("#modeSeg button").forEach((b) => b.addEventListener("click", () => setMode(b.dataset.mode)));
+  function loadDexa(d, scroll) {
+    const x = state.dexa.get(d);
+    $("dData").value = d;
+    for (const [id, k] of DEXA_CAMPOS) $(id).value = x?.[k] ?? "";
+    $("dNota").value = x?.nota ?? "";
+    $("dexaMsg").className = "toast";
+    $("dexaMsg").textContent = x ? `Editando o DEXA de ${brFull(d)}.` : "";
+    if (scroll) { setMode("dexa"); document.getElementById("hoje").scrollIntoView(); }
+  }
+  $("dData").addEventListener("change", () => loadDexa($("dData").value, false));
+  $("btnClearDexa").addEventListener("click", () => { $("dexaForm").reset(); $("dexaMsg").textContent = ""; });
+  $("dexaForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const msg = $("dexaMsg"); msg.className = "toast";
+    const data = $("dData").value;
+    const x = { data, nota: $("dNota").value.trim() || null };
+    for (const [id, k] of DEXA_CAMPOS) x[k] = num($(id).value);
+    if (!data || x.bf == null) { msg.className = "toast err"; msg.textContent = "Informe a data e a gordura total (%)."; return; }
+    try { $("btnSaveDexa").disabled = true; await store.saveDexa(x); msg.textContent = `DEXA de ${brFull(data)} salvo. A correção da balança foi recalculada.`; }
+    catch { msg.className = "toast err"; msg.textContent = "Não foi possível salvar. Verifique a conexão e tente de novo."; }
+    finally { $("btnSaveDexa").disabled = false; }
+  });
+  const onDexaClick = async (e) => {
+    const ed = e.target.closest("[data-dedit]"); const del = e.target.closest("[data-ddel]");
+    if (ed) loadDexa(ed.dataset.dedit, true);
+    if (del) {
+      if (del.dataset.confirm !== "1") { del.dataset.confirm = "1"; del.textContent = "Confirmar"; setTimeout(() => { if (del.isConnected) { del.dataset.confirm = ""; del.textContent = "Excluir"; } }, 4000); return; }
+      try { await store.deleteDexa(del.dataset.ddel); } catch { onErr({}); }
+    }
+  };
+  $("dexaBox").addEventListener("click", onDexaClick);
+  $("histWrap").addEventListener("click", onDexaClick);
 
   async function applyKcal(nova, motivo) {
     const p = state.profile;
@@ -1019,7 +1211,7 @@
 
   // ---------- backup ----------
   $("btnExport").addEventListener("click", () => {
-    const o = { app: "diario-saude", exportadoEm: new Date().toISOString(), profile: state.profileSaved ? state.profile : null, logs: Object.fromEntries(state.logs), ajustes: state.ajustes };
+    const o = { app: "diario-saude", exportadoEm: new Date().toISOString(), profile: state.profileSaved ? state.profile : null, logs: Object.fromEntries(state.logs), dexa: Object.fromEntries(state.dexa), ajustes: state.ajustes };
     const url = URL.createObjectURL(new Blob([JSON.stringify(o, null, 2)], { type: "application/json" }));
     const a = document.createElement("a");
     a.href = url; a.download = `diario-saude-backup-${todayIso()}.json`;
@@ -1037,7 +1229,7 @@
       if (!o || (typeof o.logs !== "object" && !o.profile)) throw new Error("formato");
       msg.className = "toast"; msg.textContent = "Importando…";
       await store.importAll(o);
-      msg.textContent = `Importado: ${Object.keys(o.logs || {}).length} registro(s)${o.profile ? " + perfil" : ""}.`;
+      msg.textContent = `Importado: ${Object.keys(o.logs || {}).length} registro(s)${Object.keys(o.dexa || {}).length ? ` + ${Object.keys(o.dexa).length} DEXA` : ""}${o.profile ? " + perfil" : ""}.`;
     } catch { msg.className = "toast err"; msg.textContent = "Arquivo inválido ou sem conexão. Nada foi alterado."; }
   });
 
